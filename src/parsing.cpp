@@ -4,6 +4,7 @@
 #include <stdexcept>
 
 #include "parsing.hpp"
+#include "tcolor.hpp"
 
 TSParser *_the_ash_parser = nullptr;
 
@@ -52,10 +53,6 @@ TSParser *get_ash_parser() {
     return _the_ash_parser;
 }
 
-TSTree *fget_asht(path file) {
-    return get_asht(read_file(file));
-}
-
 TSTree *get_asht(std::string str) {
     TSParser *parser = get_ash_parser();
     TSTree *tree =
@@ -71,4 +68,49 @@ TSTree *get_asht(std::string str) {
 void on_finished_parsing() {
     if (_the_ash_parser != nullptr)
         ts_parser_delete(_the_ash_parser);
+}
+
+void ts_debug_print(std::string src, TSNode node, int indent) {
+    for (int i = 0; i < indent; i++) {
+        std::cout << "    ";
+    }
+
+    if (ts_node_is_named(node)) {
+        std::cout << dark_red << ts_node_type(node) << nocolor;
+        int start = ts_node_start_byte(node);
+        int end = ts_node_end_byte(node);
+        int length = end - start;
+        bool ellipses = false;
+
+        if (length > 20) {
+            length = 20;
+            ellipses = true;
+        }
+
+        for (int i = 0; i < length; i++) {
+            if (src[start + i] != '\n')
+                continue;
+
+            length = i;
+            ellipses = true;
+            break;
+        }
+
+        std::cout << ": " << src.substr(start, length);
+        if (ellipses) {
+            std::cout << "...";
+        }
+    } else {
+        std::cout << dark_green << ts_node_type(node) << nocolor;
+    }
+
+    std::cout << std::endl;
+
+    for (u_int32_t i = 0; i < ts_node_child_count(node); i++) {
+        ts_debug_print(src, ts_node_child(node, i), indent + 1);
+    }
+}
+
+void ts_debug_print(std::string source, TSTree *tree) {
+    ts_debug_print(source, ts_tree_root_node(tree), 1);
 }

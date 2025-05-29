@@ -18,6 +18,7 @@ using namespace std::filesystem;
 
 struct AshArgs {
     bool verbose;
+    bool debug_print;
     path input;
 };
 
@@ -25,11 +26,14 @@ AshArgs parse_args(int argc, char **argv) {
     CmdLine cmd("Test command", ' ', PROGRAM_VERSION);
     SwitchArg verbose("v", "verbose", "Prints more infomation than normally",
                       cmd);
+    SwitchArg debug_print(
+        "d", "debug-print",
+        "Print the tree-sitter ast for the input file (for debugging)", cmd);
     UnlabeledValueArg<std::string> file("FILE", "The input file", true, "ERROR",
                                         "file", cmd);
     cmd.parse(argc, argv);
 
-    return {verbose.getValue(), path(file.getValue())};
+    return {verbose.getValue(), debug_print.getValue(), path(file.getValue())};
 }
 
 void run_ash(AshArgs args) {
@@ -43,9 +47,13 @@ void run_ash(AshArgs args) {
     if (args.verbose)
         std::clog << "Reading file " << args.input.string() << std::endl;
 
-    TSTree *tree = fget_asht(args.input);
-    ts_tree_delete(tree);
+    std::string src = read_file(args.input);
+    TSTree *tree = get_asht(src);
 
+    if (args.debug_print)
+        ts_debug_print(src, tree);
+
+    ts_tree_delete(tree);
     on_finished_parsing();
 }
 

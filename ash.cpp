@@ -7,7 +7,7 @@
 #include <tree_sitter/api.h>
 #include <tree_sitter/tree-sitter-ash.h>
 
-#include "parsing.hpp"
+#include "tsparsing.hpp"
 
 #ifndef PROGRAM_VERSION
 #define PROGRAM_VERSION "0.1"

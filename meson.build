@@ -21,7 +21,8 @@ ts2ast = library('ts2ast', [
 # AST
 ast_passes_src = files(
   'src/ast_passes/merge_regexes.cpp',
-  'src/ast_passes/symbol_table.cpp'
+  'src/ast_passes/symbol_table.cpp',
+  'src/ast_passes/resolve.cpp'
 )
 ast_passes = library('ast_passes', ast_passes_src, include_directories: inc, link_with: colors)
 

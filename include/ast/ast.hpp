@@ -14,6 +14,7 @@ namespace ast {
 struct File final : Node {
     std::vector<sptr<Definition>> definitions;
     std::unordered_map<std::string, sptr<Definition>> symbol_table;
+    bool error = false;
 
     File() {
     }
@@ -27,6 +28,8 @@ struct File final : Node {
         }
     }
 };
+
+sptr<AbstractNodeDefinition> create_any();
 
 } // namespace ast
 

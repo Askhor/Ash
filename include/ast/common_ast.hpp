@@ -69,8 +69,11 @@ struct Node {
     NODE_TYPE_GETTER(ERROR)
 };
 
+struct Definition;
+
 struct Identifier final : Node {
     std::string value;
+    sptr<Definition> ref;
 
     Identifier() {
     }

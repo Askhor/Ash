@@ -1,6 +1,9 @@
 #include "ts2ast.hpp"
 #include "ts2ast_helper.hpp"
 
+using namespace std;
+using namespace ast;
+
 #define read_definition_start(type, ts_type, variable_remover)                 \
     expect(src, node, ts_type);                                                \
     type def;                                                                  \
@@ -18,9 +21,10 @@ sptr<ast::Identifier> read_type_declaration(std::string src, TSNode node) {
 
 void read_definition_header(ast::Definition &into, int &child_index,
                             std::string src, TSNode node) {
-    define_child_count
+    define_child_count;
 
-        if (child_index >= child_count) throw std::runtime_error(
+    if (child_index >= child_count)
+        throw std::runtime_error(
             "Could not read definition: Identifier missing");
 
     into.name =
@@ -28,13 +32,15 @@ void read_definition_header(ast::Definition &into, int &child_index,
 
     if (child_index < child_count) {
         TSNode child = ts_node_named_child(node, child_index);
+
         if (ts_node_type(child) == (std::string) "type_declaration") {
             into.supertype = read_type_declaration(src, child);
             child_index++;
+            return;
         }
-    } else {
-        into.supertype = std::make_shared<ast::Identifier>(ast::identifier_any);
     }
+
+    into.supertype = MKSH(ast::Identifier)(ast::identifier_any);
 }
 
 sptr<ast::TokenDefinition> ast::read_token_definition(std::string src,
@@ -50,13 +56,14 @@ sptr<ast::TokenDefinition> ast::read_token_definition(std::string src,
     TSNode regex = ts_node_named_child(node, child_index);
     def.regex = ast::read_regex(src, regex);
 
-    return std::make_shared<ast::TokenDefinition>(def);
+    return MKSH(TokenDefinition)(def);
 }
-sptr<ast::AbstractNodeDefinition>
-ast::read_abstract_node_definition(std::string src, TSNode node) {
+
+sptr<AbstractNodeDefinition> ast::read_abstract_node_definition(string src,
+                                                                TSNode node) {
     read_definition_start(ast::AbstractNodeDefinition,
                           "abstract_node_definition", if (false));
-    return std::make_shared<ast::AbstractNodeDefinition>(def);
+    return MKSH(AbstractNodeDefinition)(def);
 }
 sptr<ast::NodeDefinition> ast::read_node_definition(std::string src,
                                                     TSNode node) {
@@ -68,7 +75,14 @@ sptr<ast::NodeDefinition> ast::read_node_definition(std::string src,
         def.fields.emplace_back(ast::read_field(src, field));
     }
 
-    return std::make_shared<ast::NodeDefinition>(def);
+    return MKSH(NodeDefinition)(def);
+}
+
+sptr<AbstractNodeDefinition> ast::create_any() {
+    sptr<AbstractNodeDefinition> node = MKSH(AbstractNodeDefinition)();
+    node->name = MKSH(Identifier)(identifier_any);
+    node->supertype = node->name;
+    return node;
 }
 
 #undef read_definition_start

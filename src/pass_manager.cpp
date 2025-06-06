@@ -1,5 +1,6 @@
 #include "pass_manager.hpp"
 #include "ast/passes/merge_regexes.hpp"
+#include "ast/passes/resolve.hpp"
 #include "ast/passes/symbol_table.hpp"
 #include "ts2ast.hpp"
 #include "tsparsing.hpp"
@@ -34,6 +35,8 @@ void run_passes(string src, TSTree *tree, int dump_level) {
                    : file->symbol_table) {
         cout << entry.first << ": " << entry.second->name->value << endl;
     })
+
+    resolve_symbols(file);
 
 #undef DUMP_HERE
 #undef DUMP_AST

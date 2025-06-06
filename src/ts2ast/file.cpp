@@ -31,5 +31,7 @@ sptr<ast::File> ast::read_file(std::string src, TSNode node) {
                 std::cout << src.substr(start, len) << std::endl;*/
     }
 
+    file.definitions.emplace_back(create_any());
+
     return std::make_shared<ast::File>(file);
 }

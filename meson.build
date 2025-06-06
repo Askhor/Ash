@@ -19,7 +19,11 @@ ts2ast = library('ts2ast', [
 ], include_directories: inc, dependencies: treesitter, link_with: [colors, tsparsing])
 
 # AST
-ast_passes = library('ast_passes', 'src/ast_passes/merge_regexes.cpp', include_directories: inc, link_with: colors)
+ast_passes_src = files(
+  'src/ast_passes/merge_regexes.cpp',
+  'src/ast_passes/symbol_table.cpp'
+)
+ast_passes = library('ast_passes', ast_passes_src, include_directories: inc, link_with: colors)
 
 # NFA
 nfa = library('nfa', 'src/nfa/nfa.cpp', include_directories: inc)

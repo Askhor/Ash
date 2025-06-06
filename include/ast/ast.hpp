@@ -5,6 +5,7 @@
 #include <string>
 #include <tree_sitter/api.h>
 #include <tree_sitter/tree-sitter-ash.h>
+#include <unordered_map>
 #include <vector>
 
 #include "ast/definitions.hpp"
@@ -12,6 +13,7 @@
 namespace ast {
 struct File final : Node {
     std::vector<sptr<Definition>> definitions;
+    std::unordered_map<std::string, sptr<Definition>> symbol_table;
 
     File() {
     }

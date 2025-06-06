@@ -1,9 +1,12 @@
 #include "pass_manager.hpp"
 #include "ast/passes/merge_regexes.hpp"
+#include "ast/passes/symbol_table.hpp"
 #include "ts2ast.hpp"
 #include "tsparsing.hpp"
 
-void run_passes(std::string src, TSTree *tree, int dump_level) {
+using namespace std;
+
+void run_passes(string src, TSTree *tree, int dump_level) {
 #define DUMP_HERE(code)                                                        \
     if (--dump_level == 0) {                                                   \
         code;                                                                  \
@@ -24,6 +27,13 @@ void run_passes(std::string src, TSTree *tree, int dump_level) {
     merge_regexes(file);
 
     DUMP_HERE(DUMP_AST)
+
+    create_symbol_table(file);
+
+    DUMP_HERE(for (auto entry
+                   : file->symbol_table) {
+        cout << entry.first << ": " << entry.second->name->value << endl;
+    })
 
 #undef DUMP_HERE
 #undef DUMP_AST

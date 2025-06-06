@@ -7,6 +7,9 @@
 #include <tree_sitter/api.h>
 #include <tree_sitter/tree-sitter-ash.h>
 
+#include "nfa/nfa.hpp"
+#include "pass_manager.hpp"
+#include "ts2ast.hpp"
 #include "tsparsing.hpp"
 
 #ifndef PROGRAM_VERSION
@@ -18,7 +21,7 @@ using namespace std::filesystem;
 
 struct AshArgs {
     bool verbose;
-    bool debug_print;
+    int debug_print;
     path input;
 };
 
@@ -26,7 +29,7 @@ AshArgs parse_args(int argc, char **argv) {
     CmdLine cmd("Test command", ' ', PROGRAM_VERSION);
     SwitchArg verbose("v", "verbose", "Prints more infomation than normally",
                       cmd);
-    SwitchArg debug_print(
+    MultiSwitchArg debug_print(
         "d", "debug-print",
         "Print the tree-sitter ast for the input file (for debugging)", cmd);
     UnlabeledValueArg<std::string> file("FILE", "The input file", true, "ERROR",
@@ -50,8 +53,7 @@ void run_ash(AshArgs args) {
     std::string src = read_file(args.input);
     TSTree *tree = get_asht(src);
 
-    if (args.debug_print)
-        ts_debug_print(src, tree);
+    run_passes(src, tree, args.debug_print);
 
     ts_tree_delete(tree);
     on_finished_parsing();
@@ -62,13 +64,15 @@ int main(int argc, char **argv) {
     try {
         args = parse_args(argc, argv);
     } catch (ArgException &e) {
-        std::clog << "Error: " << e.what() << std::endl;
+        std::clog << "Error: " << Color::DARK_RED << e.what() << Color::NONE
+                  << std::endl;
         return 1;
     }
     try {
         run_ash(args);
     } catch (std::runtime_error &e) {
-        std::clog << "Error: " << e.what() << std::endl;
+        std::clog << "Error: " << Color::DARK_RED << e.what() << Color::NONE
+                  << std::endl;
         return 2;
     }
 

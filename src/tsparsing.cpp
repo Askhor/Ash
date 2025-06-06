@@ -76,7 +76,7 @@ void ts_debug_print(std::string src, TSNode node, int indent) {
     }
 
     if (ts_node_is_named(node)) {
-        std::cout << dark_red << ts_node_type(node) << nocolor;
+        std::cout << Color::DARK_RED << ts_node_type(node) << Color::NONE;
         int start = ts_node_start_byte(node);
         int end = ts_node_end_byte(node);
         int length = end - start;
@@ -101,7 +101,7 @@ void ts_debug_print(std::string src, TSNode node, int indent) {
             std::cout << "...";
         }
     } else {
-        std::cout << dark_green << ts_node_type(node) << nocolor;
+        std::cout << Color::DARK_GREEN << ts_node_type(node) << Color::NONE;
     }
 
     std::cout << std::endl;
@@ -111,6 +111,10 @@ void ts_debug_print(std::string src, TSNode node, int indent) {
     }
 }
 
+void ts_debug_print(std::string source, TSNode node) {
+    ts_debug_print(source, node, 1);
+}
+
 void ts_debug_print(std::string source, TSTree *tree) {
-    ts_debug_print(source, ts_tree_root_node(tree), 1);
+    ts_debug_print(source, ts_tree_root_node(tree));
 }
